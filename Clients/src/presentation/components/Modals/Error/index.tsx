@@ -12,7 +12,7 @@ const ErrorModal: React.FC<ErrorModalProps> = ({ open, errorMessage, handleClose
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>Error</DialogTitle>
       <DialogContent>
-        <Typography color="error">{errorMessage}</Typography>
+        <Typography color="#344054">{errorMessage}</Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
