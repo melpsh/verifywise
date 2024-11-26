@@ -110,11 +110,38 @@ const ComplianceTracker = ({
     setIsModalOpen(true);
   };
 
-  const renderAccordion = (id: string, title: string) => {
+  const assignNumbers = (data: any[], prefix: string = "") => {
+    return data.map((item, index) => {
+      const currentNumber = prefix ? `${prefix}.${index + 1}` : `${index + 1}`;
+      const updatedItem = { ...item, number: currentNumber };
+
+      // Recursively process child items (e.g., rows or sub-controls)
+      if (item.children) {
+        updatedItem.children = assignNumbers(item.children, currentNumber);
+      }
+
+      return updatedItem;
+    });
+  };
+
+  const numberedAccordionData = assignNumbers(acdSumDetails);
+
+  const numberedComplianceDetails = Object.keys(complianceDetails).reduce(
+    (acc: Record<string, any>, key: string) => {
+      const section = complianceDetails[key];
+      acc[key] = {
+        ...section,
+        rows: assignNumbers(section.rows),
+      };
+      return acc;
+    },
+    {}
+  );
+
+  const renderAccordion = (id: string, title: string, number: string) => {
     // Get the specific section data for the current accordion title
-    const sectionData = complianceDetails[title];
-    console.log("🚀 ~ renderAccordion ~ sectionDataaaaaaa:", sectionData)
-    
+    const sectionData = numberedComplianceDetails[title];
+    console.log("🚀 ~ renderAccordion ~ sectionDataaaaaaa:", sectionData);
 
     if (!sectionData) {
       return <div>No data available for this section</div>;
@@ -138,7 +165,7 @@ const ComplianceTracker = ({
             position: "relative",
             "&.MuiPaper-root": { margin: 0, padding: 0, boxShadow: "none" },
             "& .MuiAccordionDetails-root": { padding: 0, margin: 0 },
-            "& .MuiAccordionSummary-root" : {height: '42px'}
+            "& .MuiAccordionSummary-root": { height: "42px" },
           }}
         >
           <AccordionSummary
@@ -162,9 +189,9 @@ const ComplianceTracker = ({
           >
             <Typography
               variant="h6"
-              sx={{ fontSize: "16px", paddingLeft: spacing(1.25)}}
+              sx={{ fontSize: "16px", paddingLeft: spacing(1.25) }}
             >
-              {title}
+              {number}. {title}
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -253,8 +280,12 @@ const ComplianceTracker = ({
           gap: theme.spacing(10),
         }}
       >
-        {acdSumDetails.map((acdSumDetail: any) =>
-          renderAccordion(acdSumDetail.summaryId, acdSumDetail.summaryTitle)
+        {numberedAccordionData.map((acdSumDetail: any) =>
+          renderAccordion(
+            acdSumDetail.summaryId,
+            acdSumDetail.summaryTitle,
+            acdSumDetail.number
+          )
         )}
       </Stack>
       {selectedRow !== null && (
@@ -266,20 +297,23 @@ const ComplianceTracker = ({
             return item.rows.find((row: any) => row.id === selectedRow)?.data[0]
               ?.data;
           })}
-          content={
-            Object.keys(complianceDetails).map((key) => {
+          content={Object.keys(complianceDetails).map((key) => {
             const item = complianceDetails[key];
             return item.rows.find((row: any) => row.id === selectedRow)?.data[0]
               ?.controlDes;
           })}
-          subControlTlts = {Object.keys(complianceDetails).flatMap((key) => {
+          subControlTlts={Object.keys(complianceDetails).flatMap((key) => {
             const item = complianceDetails[key];
-            const selectedRowData = item.rows.find((row: any) => row.id === selectedRow)?.data[0];
-            
+            const selectedRowData = item.rows.find(
+              (row: any) => row.id === selectedRow
+            )?.data[0];
+
             if (selectedRowData?.subControler) {
-              return selectedRowData.subControler.map((sub: any) => sub.subControlerTitle);
+              return selectedRowData.subControler.map(
+                (sub: any) => sub.subControlerTitle
+              );
             }
-          
+
             return []; // Return an empty array if no subControler data is found
           })}
           onConfirm={() => {
