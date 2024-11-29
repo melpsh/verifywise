@@ -28,7 +28,7 @@ interface RowData {
 
 interface ColData {
   id: number | string;
-  name: string;
+  name?: string;
 }
 
 interface TableData {

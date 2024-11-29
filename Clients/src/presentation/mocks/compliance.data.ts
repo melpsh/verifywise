@@ -983,7 +983,7 @@ export const complianceDetails = {
       },
     ],
   },
-  Registration: {
+  "Registration": {
     cols: columns,
     rows: [
       {

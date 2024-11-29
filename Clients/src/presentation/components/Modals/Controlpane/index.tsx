@@ -24,17 +24,21 @@ interface CustomModalProps {
   subControlTlts: string[];
   onConfirm: () => void;
   //Promise<{ status: number; data: any }>;
+  selectedRow: any[];
+  rowIndex: any[];
+  selectedSubControl: any[];
 }
 
 const CustomModal: React.FC<CustomModalProps> = ({
   isOpen,
   setIsOpen,
   title,
-  onConfirm,
   content,
+  selectedRow,
+  rowIndex,
+  selectedSubControl,
   subControlTlts,
 }) => {
-  console.log("🚀 ~ tittttttttle:", title);
   const theme = useTheme();
   const [selectedTab, setSelectedTab] = useState<number>(0); // State to track active tab
 
@@ -44,7 +48,6 @@ const CustomModal: React.FC<CustomModalProps> = ({
   const [activeSection, setActiveSection] = useState<string>("Overview");
   const [responseMessage, setResponseMessage] = useState<string | null>(null);
 
-  const subControlNumber = 332322;
   const handleClose = () => setIsOpen(false);
 
   const handleSelectedTab = (_: React.SyntheticEvent, newValue: number) => {
@@ -127,7 +130,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
           }}
         >
           <Typography fontSize={16} fontWeight={600} sx={{ textAlign: "left" }}>
-            {title}
+          {selectedRow}.{rowIndex[0]}. {title}
           </Typography>
 
           <CloseIcon onClick={handleClose} style={{ cursor: "pointer" }} />
@@ -201,11 +204,12 @@ const CustomModal: React.FC<CustomModalProps> = ({
             fontWeight={600}
             sx={{ textAlign: "left", mb: 3 }}
           >
+          {selectedRow}.{rowIndex}.{selectedSubControl} {title}
             {subControlTlts[selectedTab]}
           </Typography>
+
           <Typography variant="body1" sx={{ mb: 5 }}>
-            {'hiiiiiiiiiiiiiiiiii =D'}
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Similique atque natus accusantium molestiae illum labore a ut dolorem doloribus maiores rerum quibusdam, sapiente amet itaque ad culpa quidem nostrum quo mollitia nihil reiciendis autem perspiciatis minus nobis. Ab delectus consequatur harum minima similique possimus? Nostrum at porro vel nisi assumenda facere voluptatem nobis fuga repudiandae in minus temporibus voluptatibus sint accusamus quia laboriosam laudantium, eum optio facilis, aliquam quasi quae a consequuntur. Sed quibusdam beatae perferendis dolorum nihil harum sunt unde vel pariatur quasi id placeat nulla accusamus delectus deleniti soluta illum dolorem, reprehenderit explicabo quo ex? Quod, non illum.
+
           </Typography>
           {activeSection === "Overview" && (
             <Typography variant="body1">

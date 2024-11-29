@@ -138,7 +138,7 @@ const ComplianceTracker = ({
     {}
   );
 
-  const renderAccordion = (id: string, title: string, number: string) => {
+  const renderAccordion = (id: string, title: string, num: string) => {
     // Get the specific section data for the current accordion title
     const sectionData = numberedComplianceDetails[title];
     console.log("🚀 ~ renderAccordion ~ sectionDataaaaaaa:", sectionData);
@@ -191,7 +191,7 @@ const ComplianceTracker = ({
               variant="h6"
               sx={{ fontSize: "16px", paddingLeft: spacing(1.25) }}
             >
-              {number}. {title}
+              {num}. {title}
             </Typography>
           </AccordionSummary>
           <AccordionDetails>
@@ -201,6 +201,7 @@ const ComplianceTracker = ({
               reversed={false}
               table="complianceTable"
               onRowClick={handleRowClick}
+              
             />
           </AccordionDetails>
         </Accordion>
@@ -293,10 +294,29 @@ const ComplianceTracker = ({
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
           title={Object.keys(complianceDetails).map((key) => {
+            console.log("🚀 ~ title={Object.keys ~ complianceDetails:", complianceDetails)
             const item = complianceDetails[key];
             return item.rows.find((row: any) => row.id === selectedRow)?.data[0]
               ?.data;
           })}
+          selectedSubControl={Object.keys(complianceDetails).flatMap((key) => {
+            const item = complianceDetails[key];
+            const selectedRowData = item.rows.find((row: any) => row.id === selectedRow)?.data[0];
+            
+            if (selectedRowData?.subControler) {
+              return selectedRowData.subControler.map((sub: any) => sub.id);
+            }
+            return [];
+          })}
+          rowIndex={Object.keys(complianceDetails).reduce((foundIds: any[], key) => {
+            const item = complianceDetails[key];
+            const matchingRow = item.rows.find((row: any) => row.id === selectedRow);
+            return matchingRow ? [...foundIds, matchingRow.id] : foundIds;
+          }, [])}
+          selectedRow={numberedAccordionData.map((acdSumDetail: any) =>{
+            return acdSumDetail.number;
+          }
+          )}
           content={Object.keys(complianceDetails).map((key) => {
             const item = complianceDetails[key];
             return item.rows.find((row: any) => row.id === selectedRow)?.data[0]
