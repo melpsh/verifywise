@@ -63,7 +63,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
           borderRadius: theme.shape.borderRadius,
           boxShadow: 24,
           p: theme.spacing(4),
-          padding: theme.spacing(12),
+          padding: theme.spacing(16),
           "&:focus": {
             outline: "none",
           },
@@ -76,7 +76,7 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
           id="invite-user-instructions"
           fontSize={13}
           textAlign={"justify"}
-          paddingBottom={theme.spacing(8)}
+          paddingBottom={theme.spacing(16)}
         >
           When you add a new team member, they will get access to all monitors.
         </Typography>
@@ -107,6 +107,8 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
           mt={theme.spacing(4)}
           justifyContent="flex-end"
           paddingBottom={theme.spacing(4)}
+          sx={{ margin: 0 , paddingTop: '32px', paddingBottom: 0}}
+
         >
           <Button
             disableRipple
@@ -119,7 +121,6 @@ const InviteUserModal: React.FC<InviteUserModalProps> = ({
               width: 100,
               textTransform: "capitalize",
               fontSize: 13,
-              borderRadius: "4px",
               "&:hover": {
                 boxShadow: "none",
                 backgroundColor: "transparent",
