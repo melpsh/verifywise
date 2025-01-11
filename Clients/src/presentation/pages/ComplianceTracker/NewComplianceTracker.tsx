@@ -6,13 +6,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { complianceMetrics } from "../../mocks/compliance.data";
+// import { complianceMetrics } from "../../mocks/compliance.data";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ControlGroups } from "../../structures/ComplianceTracker/controls";
 import { useContext, useEffect, useState } from "react";
 import AccordionTable from "../../components/Table/AccordionTable";
 import { VerifyWiseContext } from "../../../application/contexts/VerifyWise.context";
 import { getAllEntities } from "../../../application/repository/entity.repository";
+import { users } from "../../mocks/users/users.data"; // Importing users
+import { roles } from "../../mocks/roles/roles.data";
 
 const Table_Columns = [
   { id: 1, name: "Icon" },
@@ -25,6 +27,7 @@ const Table_Columns = [
 const NewComplianceTracker = () => {
   const [expanded, setExpanded] = useState<number | false>(false);
   const { setDashboardValues } = useContext(VerifyWiseContext);
+  const [metrics, setMetrics] = useState([]);
 
   const fetchComplianceTracker = async () => {
     try {
@@ -39,7 +42,72 @@ const NewComplianceTracker = () => {
     }
   };
 
+  // Function to simulate the backend logic
+  function simulateBackendLogic(userId: number) {
+    try {
+      // Find the user by ID
+      const user = users.find((u) => u.id === userId);
+      if (!user) {
+        throw new Error(`User with ID ${userId} not found`);
+      }
+
+      // Find the role associated with the user
+      const role = roles.find((r) => r.id === user.role_id);
+      if (!role) {
+        throw new Error(`Role with ID ${user.role_id} not found`);
+      }
+
+      console.log(`User: ${user.name}, Role: ${role.name}`);
+
+
+      const userProjects = mockGetUserProjects(user.id);
+      console.log(`User Projects: ${JSON.stringify(userProjects, null, 2)}`);
+
+      return {
+        user,
+        role,
+        projects: userProjects,
+      };
+    } catch (error: unknown) {
+      console.error(
+        "Error in simulateBackendLogic:",
+        error instanceof Error ? error.message : error
+      );
+      return { error: error instanceof Error ? error.message : String(error) };
+    }
+  }
+
+  // Mock function to simulate fetching user projects
+  function mockGetUserProjects(userId: number) {
+    const mockProjects = [
+      { id: 101, userId: 1, name: "Project A" },
+      { id: 102, userId: 2, name: "Project B" },
+      { id: 103, userId: 3, name: "Project C" },
+    ];
+    return mockProjects.filter((project) => project.userId === userId);
+  }
+
+  // Run the simulation for a specific user ID
+  const result = simulateBackendLogic(1); 
+  console.log("Result:", result);
+
+  const fetchMetrics = async () => {
+    try {
+      const userId = 1;
+      const response = await getAllEntities({
+        routeUrl: `/users/${userId}/calculate-progress`,
+      });
+
+      const data = response?.data || [];
+      setMetrics(data);
+      console.log("Metrics fetched:", response.data);
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+    }
+  };
+
   useEffect(() => {
+    fetchMetrics();
     fetchComplianceTracker();
   }, []);
 
@@ -97,12 +165,10 @@ const NewComplianceTracker = () => {
         Compliance Tracker
       </Typography>
       <Stack className="new-compliance-tracker-metrics">
-        {complianceMetrics.map((metric, metricIndex) => (
+        {metrics.map((metric, metricIndex) => (
           <Stack className="metric-card" key={metricIndex}>
-            <Typography className="metric-card-name">{metric.name}</Typography>
-            <Typography className="metric-card-amount">
-              {metric.amount}
-            </Typography>
+            <Typography className="metric-card-name">{metric}</Typography>
+            <Typography className="metric-card-amount">{metric}</Typography>
           </Stack>
         ))}
       </Stack>
