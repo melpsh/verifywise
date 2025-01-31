@@ -29,7 +29,7 @@ interface FormValues {
   goal: string;
   owner: number;
   startDate: string;
-  addUsers: string | number;
+  addUsers: number[];
   riskClassification: number;
   typeOfHighRiskRole: number;
 }
@@ -49,10 +49,13 @@ const initialState: FormValues = {
   goal: "",
   owner: 0,
   startDate: "",
-  addUsers: "",
+  addUsers: [],
   riskClassification: 0,
   typeOfHighRiskRole: 0,
 };
+
+const VALID_USER_IDS = [0, 1, 2, 3];
+const VALID_RISK_CLASSIFICATIONS = [0, 1, 2, 3];
 
 const ProjectSettings: FC<ProjectSettingsProps> = React.memo(
   ({ setTabValue }) => {
@@ -119,17 +122,32 @@ const ProjectSettings: FC<ProjectSettingsProps> = React.memo(
           startDate: project.start_date
             ? new Date(project.start_date).toISOString()
             : "",
-          riskClassification: getMappedId(project.ai_risk_classification, [
-            { _id: 1, name: "Limited Risk" },
-            { _id: 2, name: "Medium Risk" },
-            { _id: 3, name: "High Risk" },
-          ]),
+          riskClassification: VALID_RISK_CLASSIFICATIONS.includes(
+            Number(project.ai_risk_classification)
+          )
+            ? Number(project.ai_risk_classification)
+            : 0,
           typeOfHighRiskRole: getMappedId(project.type_of_high_risk_role, [
             { _id: 1, name: "Provider" },
             { _id: 2, name: "Controller" },
             { _id: 3, name: "User" },
           ]),
-          addUsers: JSON.parse(project.users || ""),
+          addUsers:
+            project.users && typeof project.users === "string"
+              ? (() => {
+                  try {
+                    const parsedUsers = JSON.parse(project.users);
+                    return Array.isArray(parsedUsers)
+                      ? parsedUsers.filter((id) => VALID_USER_IDS.includes(id))
+                      : [];
+                  } catch (e) {
+                    console.error("Failed to parse project users:", e);
+                    return [];
+                  }
+                })()
+              : Array.isArray(project.users)
+              ? project.users.filter((id) => VALID_USER_IDS.includes(id))
+              : [],
         }));
       }
     }, [project, isLoading]);
@@ -161,11 +179,7 @@ const ProjectSettings: FC<ProjectSettingsProps> = React.memo(
 
       const addUsers = selectValidation(
         "Team members",
-        Array.isArray(values.addUsers)
-          ? values.addUsers.length
-          : values.addUsers
-          ? 1
-          : 0
+        values.addUsers ? 1 : 0
       );
       if (!addUsers.accepted) {
         newErrors.addUsers = addUsers.message;
@@ -175,6 +189,7 @@ const ProjectSettings: FC<ProjectSettingsProps> = React.memo(
       if (!owner.accepted) {
         newErrors.owner = owner.message;
       }
+
       const riskClassification = selectValidation(
         "AI risk classification",
         values.riskClassification
@@ -182,6 +197,7 @@ const ProjectSettings: FC<ProjectSettingsProps> = React.memo(
       if (!riskClassification.accepted) {
         newErrors.riskClassification = riskClassification.message;
       }
+
       const typeOfHighRiskRole = selectValidation(
         "Type of high risk role",
         values.typeOfHighRiskRole
@@ -353,7 +369,7 @@ const ProjectSettings: FC<ProjectSettingsProps> = React.memo(
             id="team-members"
             label="Team members"
             onChange={handleOnSelectChange("addUsers")}
-            value={values.addUsers}
+            value={values.addUsers[0] || ""}
             placeholder="Select team members"
             items={[
               { _id: 1, name: "Some value 1" },
