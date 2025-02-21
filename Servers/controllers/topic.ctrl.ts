@@ -5,6 +5,7 @@ import {
   createNewTopicQuery,
   deleteTopicByIdQuery,
   getAllTopicsQuery,
+  getTopicByAssessmentIdQuery,
   getTopicByIdQuery,
   updateTopicByIdQuery,
 } from "../utils/topic.utils";
@@ -13,6 +14,7 @@ import {
   RequestWithFile,
 } from "../utils/question.utils";
 import { createNewSubtopicQuery } from "../utils/subtopic.utils";
+import { Topic } from "../models/topic.model";
 
 export async function getAllTopics(req: Request, res: Response): Promise<any> {
   try {
@@ -50,11 +52,7 @@ export async function createNewTopic(
 ): Promise<any> {
   console.log("Create topics", req.body);
   try {
-    const newTopic: {
-      id: number;
-      assessmentId: number;
-      title: string;
-    } = req.body;
+    const newTopic: Topic = req.body;
 
     const createdTopic = await createNewTopicQuery(newTopic);
 
@@ -74,10 +72,7 @@ export async function updateTopicById(
 ): Promise<any> {
   try {
     const topicId = parseInt(req.params.id);
-    const updatedTopic: {
-      assessmentId: number;
-      title: string;
-    } = req.body;
+    const updatedTopic: Topic = req.body;
 
     const topic = await updateTopicByIdQuery(topicId, updatedTopic);
 
@@ -105,6 +100,29 @@ export async function deleteTopicById(
     }
 
     return res.status(204).json(STATUS_CODE[204](topic));
+  } catch (error) {
+    return res.status(500).json(STATUS_CODE[500]((error as Error).message));
+  }
+}
+
+export async function getTopicByAssessmentId(
+  req: Request,
+  res: Response
+): Promise<any> {
+  try {
+    const assessmentId = parseInt(req.params.id);
+
+    if (isNaN(assessmentId)) {
+      return res.status(400).json(STATUS_CODE[400]("Invalid assessment ID"));
+    }
+
+    const topics = await getTopicByAssessmentIdQuery(assessmentId);
+
+    if (topics && topics.length > 0) {
+      return res.status(200).json(STATUS_CODE[200](topics));
+    }
+
+    return res.status(204).json(STATUS_CODE[204](topics));
   } catch (error) {
     return res.status(500).json(STATUS_CODE[500]((error as Error).message));
   }
