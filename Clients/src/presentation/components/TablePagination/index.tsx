@@ -19,7 +19,7 @@ import { ReactComponent as LeftArrow } from "../../assets/icons/left-arrow.svg";
 import { ReactComponent as RightArrow } from "../../assets/icons/right-arrow.svg";
 import { ReactComponent as RightArrowDouble } from "../../assets/icons/right-arrow-double.svg";
 
-interface VWTablePaginationActionsProps {
+interface TablePaginationActionsProps {
   count: number;
   page: number;
   rowsPerPage: number;
@@ -29,7 +29,7 @@ interface VWTablePaginationActionsProps {
   ) => void;
 }
 
-const VWTablePaginationActions: React.FC<VWTablePaginationActionsProps> = ({
+const TablePaginationActions: React.FC<TablePaginationActionsProps> = ({
   count,
   page,
   rowsPerPage,
@@ -97,4 +97,4 @@ const VWTablePaginationActions: React.FC<VWTablePaginationActionsProps> = ({
   );
 };
 
-export default VWTablePaginationActions;
+export default TablePaginationActions;
